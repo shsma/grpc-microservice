@@ -5,8 +5,11 @@ import (
 	"github.com/shsma/grpc-microservice/internal/rocket"
 	rkt "github.com/shsma/grpc-microservice/proto/rocket/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
+	"strconv"
 )
 
 // RocketService - define the interface that the
@@ -64,6 +67,11 @@ func (h Handler) GetRocket(ctx context.Context, req *rkt.GetRocketRequest) (*rkt
 
 func (h Handler) AddRocket(ctx context.Context, req *rkt.AddRocketRequest) (*rkt.AddRocketResponse, error) {
 	log.Print("Add Rocket gRPC endpoint hit")
+	if _, err := strconv.Atoi(req.Rocket.Id); err != nil {
+		errorStatus := status.Error(codes.InvalidArgument, "given id is not valid")
+		log.Print("given id is not valid")
+		return &rkt.AddRocketResponse{}, errorStatus
+	}
 	newRkt, err := h.RocketService.InsertRocket(ctx, rocket.Rocket{
 		ID:   req.Rocket.Id,
 		Type: req.Rocket.Type,

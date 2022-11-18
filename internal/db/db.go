@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
-	uuid "github.com/satori/go.uuid"
+	//uuid "github.com/satori/go.uuid"
 	"github.com/shsma/grpc-microservice/internal/rocket"
 )
 
@@ -78,14 +78,14 @@ func (s Store) InsertRocket(rkt rocket.Rocket) (rocket.Rocket, error) {
 // DeleteRocket - attempts to delete a rocket
 // from the database return err if error
 func (s Store) DeleteRocket(id string) error {
-	uid, err := uuid.FromString(id)
-	if err != nil {
-		return err
-	}
+	//uid, err := uuid.FromString(id)
+	//if err != nil {
+	//	return err
+	//}
 
-	_, err = s.db.Exec(
+	_, err := s.db.Exec(
 		`DELETE FROM rockets where id=$1`,
-		uid,
+		id,
 	)
 	if err != nil {
 		return err

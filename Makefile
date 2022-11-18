@@ -4,3 +4,6 @@ build:
 	 protoc -I./proto --go_out=./proto/rocket/v1 \
  					  --go-grpc_out=./proto/rocket/v1 \
  					   proto/rocket/**/*.proto
+
+test-acceptance:
+	go test ./test -tags=acceptance -v
