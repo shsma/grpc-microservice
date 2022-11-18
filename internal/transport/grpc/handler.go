@@ -45,19 +45,51 @@ func (h Handler) Serve() error {
 	return nil
 }
 
-func (h Handler) mustEmbedUnimplementedRocketServiceServer() {
-	//TODO implement me
-	panic("implement me")
-}
-
+// GetRocket - retrieve a rocket by ID and return the response
 func (h Handler) GetRocket(ctx context.Context, req *rkt.GetRocketRequest) (*rkt.GetRocketResponse, error) {
-	return &rkt.GetRocketResponse{}, nil
+	log.Print("GetRocket gRPC Endpoint Hit")
+	rocket, err := h.RocketService.GetRocketByID(ctx, req.Id)
+	if err != nil {
+		log.Print("Failed to retrieve rocket by ID")
+		return &rkt.GetRocketResponse{}, err
+	}
+	return &rkt.GetRocketResponse{
+		Rocket: &rkt.Rocket{
+			Id:   rocket.ID,
+			Name: rocket.Name,
+			Type: rocket.Type,
+		},
+	}, nil
 }
 
 func (h Handler) AddRocket(ctx context.Context, req *rkt.AddRocketRequest) (*rkt.AddRocketResponse, error) {
-	return &rkt.AddRocketResponse{}, nil
+	log.Print("Add Rocket gRPC endpoint hit")
+	newRkt, err := h.RocketService.InsertRocket(ctx, rocket.Rocket{
+		ID:   req.Rocket.Id,
+		Type: req.Rocket.Type,
+		Name: req.Rocket.Name,
+	})
+	if err != nil {
+		log.Print("failed to insert rocket into database")
+		return &rkt.AddRocketResponse{}, err
+	}
+	return &rkt.AddRocketResponse{
+		Rocket: &rkt.Rocket{
+			Id:   newRkt.ID,
+			Type: newRkt.Type,
+			Name: newRkt.Name,
+		},
+	}, nil
 }
 
+// DeleteRocket - handler for deleting a rocket
 func (h Handler) DeleteRocket(ctx context.Context, req *rkt.DeleteRocketRequest) (*rkt.DeleteRocketResponse, error) {
-	return &rkt.DeleteRocketResponse{}, nil
+	log.Print("delete rocket gRPC endpoint hit")
+	err := h.RocketService.DeleteRocket(ctx, req.Rocket.Id)
+	if err != nil {
+		return &rkt.DeleteRocketResponse{}, err
+	}
+	return &rkt.DeleteRocketResponse{
+		Status: "successfully delete rocket",
+	}, nil
 }
